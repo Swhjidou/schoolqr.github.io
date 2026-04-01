@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Accès Sécurisé - QR Code</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #1a1a2e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #16213e;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        #access-form { display: block; }
+        #qr-content { display: none; } /* Caché par défaut */
+        
+        input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 10px;
+            width: 80%;
+        }
+        .btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .qr-wrapper {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        img { width: 250px; height: 250px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="access-form">
+            <h1>Contenu Protégé</h1>
+            <p>Veuillez entrer le mot de passe :</p>
+            <input type="password" id="password-input" placeholder="Mot de passe...">
+            <br>
+            <button class="btn" onclick="checkPassword()">Valider</button>
+            <p id="error-msg" style="color: #e94560; font-size: 0.8rem;"></p>
+        </div>
+
+        <div id="qr-content">
+            <h1>Accès Autorisé</h1>
+            <div class="qr-wrapper">
+                <img src="QRPro1.png" alt="QR Code">
+            </div>
+            <p>Scannez l'image ci-dessus</p>
+            <button class="btn" onclick="location.reload()" style="background:#555;">Verrouiller</button>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const mdpSaisi = document.getElementById('password-input').value;
+            const mdpCorrect = "1234"; // <--- CHANGE TON MOT DE PASSE ICI
+
+            if (mdpSaisi === mdpCorrect) {
+                document.getElementById('access-form').style.display = 'none';
+                document.getElementById('qr-content').style.display = 'block';
+            } else {
+                document.getElementById('error-msg').innerText = "Mot de passe incorrect !";
+            }
+        }
+    </script>
+
+</body>
+</html>
