@@ -1,90 +1,113 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Accès Sécurisé - QR Code</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #1a1a2e;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: #16213e;
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        }
-        #access-form { display: block; }
-        #qr-content { display: none; } /* Caché par défaut */
-        
-        input {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            margin-bottom: 10px;
-            width: 80%;
-        }
-        .btn {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .qr-wrapper {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 20px;
-        }
-        img { width: 250px; height: 250px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vérification QR</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f5f5f5;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .error {
+      color: red;
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .ok {
+      color: green;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .info {
+      color: #555;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Vérification du QR Code</h1>
+    <div id="message"></div>
+    <div id="imageContainer"></div>
+  </div>
 
-    <div class="card">
-        <div id="access-form">
-            <h1>Contenu Protégé</h1>
-            <p>Veuillez entrer le mot de passe :</p>
-            <input type="password" id="password-input" placeholder="Mot de passe...">
-            <br>
-            <button class="btn" onclick="checkPassword()">Valider</button>
-            <p id="error-msg" style="color: #e94560; font-size: 0.8rem;"></p>
-        </div>
+  <script>
+    function getParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
 
-        <div id="qr-content">
-            <h1>Accès Autorisé</h1>
-            <div class="qr-wrapper">
-                <img src="QRPro1.png" alt="QR Code">
-            </div>
-            <p>Scannez l'image ci-dessus</p>
-            <button class="btn" onclick="location.reload()" style="background:#555;">Verrouiller</button>
-        </div>
-    </div>
+    function decodeBase64UrlSafe(str) {
+      try {
+        // Remettre le format base64 standard
+        str = str.replace(/-/g, '+').replace(/_/g, '/');
 
-    <script>
-        function checkPassword() {
-            const mdpSaisi = document.getElementById('password-input').value;
-            const mdpCorrect = "1234"; // <--- CHANGE TON MOT DE PASSE ICI
-
-            if (mdpSaisi === mdpCorrect) {
-                document.getElementById('access-form').style.display = 'none';
-                document.getElementById('qr-content').style.display = 'block';
-            } else {
-                document.getElementById('error-msg').innerText = "Mot de passe incorrect !";
-            }
+        // Ajouter le padding si nécessaire
+        while (str.length % 4) {
+          str += '=';
         }
-    </script>
 
+        return atob(str);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const encodedUrl = getParam("url");
+    const exp = parseInt(getParam("exp"));
+    const token = getParam("token"); // optionnel ici
+
+    const messageDiv = document.getElementById("message");
+    const imageContainer = document.getElementById("imageContainer");
+
+    if (!encodedUrl || !exp) {
+      messageDiv.innerHTML = '<div class="error">❌ Paramètres invalides dans le QR code.</div>';
+    } else {
+      const now = Math.floor(Date.now() / 1000);
+
+      if (now > exp) {
+        messageDiv.innerHTML = '<div class="error">⛔ QR Code expiré !</div>';
+      } else {
+        const imageUrl = decodeBase64UrlSafe(encodedUrl);
+
+        if (!imageUrl) {
+          messageDiv.innerHTML = '<div class="error">❌ Impossible de décoder l’URL de l’image.</div>';
+        } else {
+          const reste = exp - now;
+
+          messageDiv.innerHTML = `
+            <div class="ok">✅ QR Code valide</div>
+            <div class="info">Temps restant : ${reste} secondes</div>
+          `;
+
+          imageContainer.innerHTML = `<img src="${imageUrl}" alt="Photo affichée via QR Code" />`;
+        }
+      }
+    }
+  </script>
 </body>
 </html>
