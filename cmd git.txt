@@ -1,0 +1,6 @@
+sgit init 
+git status
+git add . 
+git commit -m "message"
+git remote add origin url_gitub
+git push origin master
