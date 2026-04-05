@@ -2,7 +2,10 @@ import qrcode
 from PIL import Image
 
 
-url = "https://github.com/Swhjidou/schoolqr.github.io/"
+# url = "https://github.com/Swhjidou/schoolqr.github.io/"
+
+url = "https://swhjidou.github.io/schoolqr.github.io/"
+
 
 qr = qrcode.QRCode(
     version=1,
