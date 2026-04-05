@@ -1,6 +1,17 @@
-sgit init 
+git init 
 git status
 git add . 
 git commit -m "message"
 git remote add origin url_gitub
 git push origin master
+
+# Vérifier que tout est bien poussé 
+git remote show origin
+
+# Cloner le dépôt ailleurs
+git clone https://github.com/Swhjidou/sourcemaths.github.io.git
+
+# Ajouter d'autres fichiers
+git add nouveau_fichier.pdf
+git commit -m "Ajout d'un nouveau fichier"
+git push
