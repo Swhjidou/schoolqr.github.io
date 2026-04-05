@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+    <div class="container">
+        <h1>Bien venus Sur ma page !</h1>
+        <div class="galerie">
+            <div class="photo-card">
+                <div class="photo-container">
+                    <img src="{{ url_for('static', filename='images/photo1.jpeg')}}"
+                        alt="photo 1"
+                        class="ma-photo"
+                        onclick="ouvrirPleinEcran(0)">
+                </div>
+                <p class="photo-titre">Photo 1</p>
+            </div>
+            
+            <div class="photo-card">
+                <div class="photo-container">
+                    <img src="{{ url_for('static', filename='images/photo2.jpeg') }}"
+                        alt="Deuxieme photo"
+                        class="ma-photo"
+                        onclick="ouvrirPleinEcran(1)">
+                </div>
+                <p class="photo-titre">Photo 2</p>
+            </div>
+
+            <div class="photo-card">
+                <div class="photo-container">
+                    <img src="{{ url_for('static', filename='images/photo3.jpeg') }}" 
+                        alt="Troixieme photo"
+                        class="ma-photo"
+                        onclick="ouvrirPleinEcran(2)">
+                </div>
+                <p class="photo-titre">photo 3</p>
+            </div>
+
+            <div class="photo-card">
+                <div class="photo-container">
+                    <img src="{{ url_for('static', filename='images/photo4.jpeg') }}" 
+                        alt="Quatrieme photo"
+                        class="ma-photo"
+                        onclick="ouvrirPleinEcran(3)">
+                </div>
+                <p class="photo-titre">photo 4</p>
+            </div>
+
+            <div class="photo-card">
+                <div class="photo-container">
+                    <img src="{{url_for('static', filename='images/photo4.jpeg') }}" 
+                        alt="Cinquieme photo"
+                        class="ma-photo"
+                        onclick="ouvrirPleinEcran(4)">
+                </div>
+                <p></p>
+            </div>
+        </div>
+        <p>Ceci est une page web servie par Python avec Flask !</p>
+        <button id="monBouton">Cliquer-moi</button>
+        <p id="message"></p>
+    </div>
+
+    <!-- Modale pour le plein écran -->
+    <div id="modele" class="modele" onclick="fermerPleinEcran()">
+        <span class="fermer">&times;</span>
+        <img class="modele-contenu" id="imageModele">
+        <!-- Flèches de navigation -->
+        <div class="nav-gauche" onclick="event.stopPropagation(); photoPrecedente()">&#10094;</div>
+        <div class="nav-droite" onclick="event.stopPropagation(); photoSuivante()">&#10095;</div>
+    </div>
+
+    <script>
+        // Liste des photos
+        const photos = [
+            "{{ url_for('static', filename='images/photo1.jpeg') }}",
+            "{{ url_for('static', filename='images/photo2.jpeg') }}",
+            "{{ url_for('static', filename='images/photo3.jpeg') }}",
+            "{{ url_for('static', filename='images/photo4.jpeg') }}",
+            "{{ url_for('static', filename='images/photo5.jpeg') }}"
+        ];
+        
+        let indexActuel = 0;
+
+        const bouton = document.getElementById('monBouton');
+        const message = document.getElementById("message");
+        const modele = document.getElementById("modele");
+        const imageModele = document.getElementById("imageModele");
+
+        bouton.addEventListener('click', function(){
+            message.innerHTML = "Vous avez cliqué sur le bouton !";
+            message.style.color = 'blue';
+        })
+
+        // Fonction pour ouvrir la photo en plein écran
+        function ouvrirPleinEcran(index) {
+            indexActuel = index;
+            imageModele.src = photos[indexActuel];
+            modele.style.display = "flex";
+        }
+
+        // Fonction pour fermer le plein écran 
+        function fermerPleinEcran() {
+            modele.style.display = "none";
+        }
+
+        // Photo suivante
+        function photoSuivante() {
+            indexActuel = (indexActuel + 1) % photos.length;
+            imageModele.src = photos[indexActuel];
+        }
+
+        // Photo précédente
+        function photoPrecedente() {
+            indexActuel = (indexActuel - 1 + photos.length) % photos.length;
+            imageModele.src = photos[indexActuel];
+        }
+
+        // Navigation avec les flèches du clavier
+        document.addEventListener("keydown", function(event) {
+            if (modele.style.display === "flex") {
+                if (event.key === "ArrowRight") {
+                    photoSuivante();
+                } else if (event.key === "ArrowLeft") {
+                    photoPrecedente();
+                } else if (event.key === "Escape") {
+                    fermerPleinEcran();
+                }
+            }
+        });
+
+        // ========== COMPTEUR ==========
+        let tempsRestant = 180; // 3 minutes (180 secondes)
+        let compteurInterval;
+
+        // Créer l'affichage du compteur
+        const compteurDiv = document.createElement("div");
+        compteurDiv.id = "compteur";
+        compteurDiv.innerHTML = `
+            <div class="compteur-contenu">
+                <span class="compteur-icone">⏱️</span>
+                <span class="compteur-temps" id="temps">03:00</span>
+                <span class="compteur-texte">Avant fermeture</span>
+            </div>
+        `;
+        document.body.appendChild(compteurDiv);
+
+        // Fonction pour formater le temps (mm:ss)
+        function formaterTemps(secondes) {
+            const minutes = Math.floor(secondes / 60);
+            const secs = secondes % 60;
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Fonction pour mettre à jour l'affichage du compteur
+        function mettreAJourCompteur() {
+            const tempsElement = document.getElementById('temps');
+            tempsElement.textContent = formaterTemps(tempsRestant);
+
+            // Changement de couleur selon le temps restant
+            if (tempsRestant <= 30) {
+                tempsElement.style.color = '#ff4444';
+                tempsElement.style.fontSize = '28px';
+            } else if (tempsRestant <= 60) {
+                tempsElement.style.color = '#ffaa00';
+                tempsElement.style.fontSize = '24px';
+            } else {
+                tempsElement.style.color = '#4caf50';
+                tempsElement.style.fontSize = '20px';
+            }
+            
+            // Si le temps est écoulé
+            if (tempsRestant <= 0) {
+                clearInterval(compteurInterval);
+                // Afficher un message avant de fermer
+                document.body.innerHTML = `
+                    <div style="
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        font-family: Arial, sans-serif;
+                    ">
+                        <div style="
+                            background: white;
+                            padding: 40px;
+                            border-radius: 20px;
+                            text-align: center;
+                            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                        ">
+                            <h1 style="color: #333;">⏰ Session terminée ⏰</h1>
+                            <p style="color: #666; font-size: 18px;">Le temps imparti de 3 minutes est écoulé.</p>
+                            <p style="color: #999; font-size: 14px;">Actualisez la page pour recommencer</p>
+                        </div>
+                    </div>
+                `;
+            }
+            tempsRestant--;
+        }
+
+        // Fonction pour réinitialiser le timer
+        function resetTimer() {
+            tempsRestant = 180; // Remet à 3 minutes
+            mettreAJourCompteur();
+            
+            // Réinitialiser l'intervalle
+            clearInterval(compteurInterval);
+            compteurInterval = setInterval(mettreAJourCompteur, 1000);
+        }
+
+        // Démarrer le compteur
+        resetTimer();
+        
+        // Réinitialiser le timer quand l'utilisateur interagit avec la page
+        // document.addEventListener('mousemove', resetTimer);
+        // document.addEventListener('click', resetTimer);
+        // document.addEventListener('keydown', resetTimer);
+        // document.addEventListener('scroll', resetTimer);
+    </script>
+</body>
+</html>
