@@ -1,8 +1,8 @@
 import qrcode
 from PIL import Image
 
-qrphotos = "mon_projet1"
-url = f"https://github.com/Swhjidou/schoolqr.github.io/{qrphotos}"
+
+url = "https://github.com/Swhjidou/schoolqr.github.io/"
 
 qr = qrcode.QRCode(
     version=1,
