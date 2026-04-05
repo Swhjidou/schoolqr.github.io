@@ -237,3 +237,26 @@ button:hover {
     background: rgba(0, 0, 0, 0.95);
     transform: scale(1.05);
 }
+
+/* QR Code Section */
+.qr-section {
+    margin-top: 40px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.qr-display {
+    width: 200px;
+    height: 200px;
+    margin: 10px auto;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.qr-text {
+    font-size: 12px;
+    color: #666;
+    word-break: break-all;
+}
